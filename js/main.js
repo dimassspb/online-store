@@ -120,3 +120,9 @@ navigationLink.forEach((el) => {
     filterCards(field, value);
   });
 });
+
+// All goods
+navigationLink[5].addEventListener('click', (event) => {
+event.preventDefault();
+  getGoods().then(renderCards);;
+});

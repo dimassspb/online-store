@@ -99,23 +99,20 @@ more.addEventListener('click', (event) => {
 });
 
 const filterCards = (field, value) => {
-
   getGoods()
     .then((data) => {
-
-        const filteredGoods = data.filter((good) => {
-          return good[field] === value;
+      const filteredGoods = data.filter((good) => {
+        return good[field] === value;
       });
       return filteredGoods;
     })
     .then(renderCards);
 };
 
-
 navigationLink.forEach((el) => {
   el.addEventListener('click', (event) => {
     event.preventDefault();
-        const field = el.dataset.field;
+    const field = el.dataset.field;
     const value = el.textContent;
     filterCards(field, value);
   });
@@ -123,6 +120,34 @@ navigationLink.forEach((el) => {
 
 // All goods
 navigationLink[5].addEventListener('click', (event) => {
-event.preventDefault();
-  getGoods().then(renderCards);;
+  event.preventDefault();
+  getGoods().then(renderCards);
+});
+
+// buttons
+
+buttons = Array.from(document.getElementsByClassName('button-text'));
+acessoriesButton = buttons[7];
+clothesButton = buttons[8];
+
+acessoriesButton.addEventListener('click', (event) => {
+  getGoods()
+    .then((data) => {
+      const filteredGoods = data.filter((good) => {
+        return good.category === 'Accessories';
+      });
+      return filteredGoods;
+    })
+    .then(renderCards);
+});
+
+clothesButton.addEventListener('click', (event) => {
+  getGoods()
+    .then((data) => {
+      const filteredGoods = data.filter((good) => {
+        return good.category === 'Clothing';
+      });
+      return filteredGoods;
+    })
+    .then(renderCards);
 });

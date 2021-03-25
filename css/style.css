@@ -394,6 +394,18 @@ button {
     font-size: 24px;
     border: none;
 }
+/*   Д.З */
+.modal-my-own-button {
+
+    height: 40px;
+    width: 150px;
+    border-radius: 20px;
+    border-style: none;
+    margin-bottom: 20px;
+    color: #FFFFFF;
+    background-color:red ;
+}
+
 
 .modal-form {
     display: flex;

@@ -20,6 +20,8 @@ const navigationLink = document.querySelectorAll(
 const longGoodsList = document.querySelector('.long-goods-list');
 const cartTableGoods = document.querySelector('.cart-table__goods');
 const cartTableTotal = document.querySelector('.cart-table__total');
+const cartCount = document.querySelector('.cart-count');
+const btnDanger = document.querySelector('.modal-my-own-button');
 
 const getGoods = async () => {
   const result = await fetch('db/db.json'); //server url
@@ -31,6 +33,17 @@ const getGoods = async () => {
 
 const cart = {
   cartGoods: [],
+  countQuantity() {
+    cartCount.textContent = this.cartGoods.reduce((sum, item) => {
+      return sum + item.count;
+    }, 0);
+  },
+  clearCart() {
+    this.cartGoods.length = 0;
+    cartCount.textContent = '';
+    this.countQuantity();
+    this.renderCart();
+  },
   renderCart() {
     cartTableGoods.textContent = '';
     this.cartGoods.forEach(({ id, name, price, count }) => {
@@ -49,12 +62,6 @@ const cart = {
       cartTableGoods.append(trGood);
     });
 
-    // Домашнее задание
-console.log(this.cartGoods);
-    counter = document.querySelector('.cart-count');
-    const goodsCounter = this.cartGoods.reduce((sum, item) => sum + item.count, 0);
-    counter.textContent = goodsCounter;
-    //
     const totalPrice = this.cartGoods.reduce((sum, item) => {
       return sum + item.price * item.count;
     }, 0);
@@ -63,6 +70,7 @@ console.log(this.cartGoods);
   deleteGood(id) {
     this.cartGoods = this.cartGoods.filter((item) => id !== item.id);
     this.renderCart();
+    this.countQuantity();
   },
   minusGood(id) {
     for (const item of this.cartGoods) {
@@ -76,6 +84,7 @@ console.log(this.cartGoods);
       }
     }
     this.renderCart();
+    this.countQuantity();
   },
   plusGood(id) {
     for (const item of this.cartGoods) {
@@ -85,6 +94,7 @@ console.log(this.cartGoods);
       }
     }
     this.renderCart();
+    this.countQuantity();
   },
   addCardGoods(id) {
     const goodItem = this.cartGoods.find((item) => item.id === id);
@@ -100,18 +110,20 @@ console.log(this.cartGoods);
             price,
             count: 1,
           });
+          this.countQuantity();
         });
     }
-
   },
 };
 
+btnDanger.addEventListener('click', () => {
+  cart.clearCart();
+});
 
 document.body.addEventListener('click', (event) => {
   const addToCart = event.target.closest('.add-to-cart');
   if (addToCart) {
     cart.addCardGoods(addToCart.dataset.id);
-
   }
 });
 
@@ -245,16 +257,45 @@ showClothing.forEach((item) => {
   });
 });
 
-// Домашнее задание Очистка корзины кнопкой
+// server
 
-const deleteCart = addEventListener('click', (event) => {
-  const target = event.target;
-  if (target.classList.contains('modal-my-own-button')) {
-    cart.cartGoods = [];
+const modalForm = document.querySelector('.modal-form');
+const postData = (dataUser) =>
+  fetch('../server.php', {
+    method: 'POST',
+    body: dataUser,
+  });
+
+modalForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const formData = new FormData(modalForm);
+  formData.append('cart', JSON.stringify(cart.cartGoods));
+  // Домашнее задание
+  const nameValue = document.querySelector('#popup-name-form');
+  const phoneValue = document.querySelector('#popup-phone-form');
+  if (
+    nameValue.value.trim() !== '' &&
+    phoneValue.value.trim() !== '' &&
+    cart.cartGoods.length > 0
+  ) {
+    postData(formData)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(response.status);
+        }
+        alert('Спасибо за заказ');
+      })
+      .catch((error) => {
+        alert('Ошибка!!!');
+        console.log(error);
+      })
+      .finally(() => {
+        closeModal();
+        modalForm.reset();
+        cart.cartGoods.length = 0;
+        cartCount.textContent = '';
+      });
+  } else {
+    alert('Введите корректные данные');
   }
-  cart.renderCart();
 });
-
-//
-
-
